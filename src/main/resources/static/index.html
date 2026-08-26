@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthFlow API Client</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        body {
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(79, 70, 229, 0.1), transparent 40%),
+                        #020617;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="w-full max-w-5xl mx-auto px-6 py-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">AuthFlow</h1>
+                <p class="text-xs text-slate-500">API Portal Client</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="flex h-2.5 w-2.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span class="text-xs font-semibold text-emerald-400 tracking-wider uppercase">Backend Online</span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 w-full max-w-lg mx-auto px-6 py-8">
+        <div class="glass rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-800 mb-8" id="tabs">
+                <button onclick="switchTab('login')" id="tab-login" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-brand-500 text-white transition-all">Login</button>
+                <button onclick="switchTab('register')" id="tab-register" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Register</button>
+                <button onclick="switchTab('forgot')" id="tab-forgot" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Forgot</button>
+                <button onclick="switchTab('profile')" id="tab-profile" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2">
+                    Profile <i data-lucide="user" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Forms -->
+            <div>
+                <!-- Login View -->
+                <div id="view-login" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">Email address</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input id="login-email" type="email" placeholder="you@example.com" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input id="login-password" type="password" placeholder="••••••••" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                        </div>
+                    </div>
+                    <button onclick="submitLogin()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 flex items-center justify-center gap-2">
+                        Sign In <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+
+                    <div class="relative my-6">
+                        <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-slate-800"></span></div>
+                        <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-950 px-3 text-slate-500 font-semibold tracking-wider">Or continue with</span></div>
+                    </div>
+
+                    <a href="/oauth2/authorization/google" class="w-full bg-slate-900 border border-slate-850 hover:bg-slate-850 text-white font-medium py-3 rounded-xl transition-all flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Google Account
+                    </a>
+                </div>
+
+                <!-- Register View -->
+                <div id="view-register" class="space-y-6 hidden">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">Full Name</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input id="register-name" type="text" placeholder="John Doe" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">Email address</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input id="register-email" type="email" placeholder="you@example.com" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input id="register-password" type="password" placeholder="••••••••" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                        </div>
+                    </div>
+                    <button onclick="submitRegister()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 flex items-center justify-center gap-2">
+                        Create Account <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- OTP View (Hidden by default, shown after register) -->
+                <div id="view-otp" class="space-y-6 hidden">
+                    <div class="text-center space-y-2">
+                        <i data-lucide="key" class="w-12 h-12 text-brand-500 mx-auto"></i>
+                        <h3 class="text-lg font-bold">Email Verification OTP</h3>
+                        <p class="text-sm text-slate-400">An OTP code has been sent to your email.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">Enter OTP Code</label>
+                        <input id="otp-code" type="text" maxlength="6" placeholder="000000" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3.5 text-center text-xl font-bold tracking-widest text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                    </div>
+                    <button onclick="submitOtp()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                        Verify OTP <i data-lucide="check" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Forgot Password View -->
+                <div id="view-forgot" class="space-y-6 hidden">
+                    <div class="text-center space-y-2">
+                        <i data-lucide="lock" class="w-12 h-12 text-brand-500 mx-auto"></i>
+                        <h3 class="text-lg font-bold">Trouble Logging In?</h3>
+                        <p class="text-sm text-slate-400">Enter your email and we'll send you a password reset link.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">Email address</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input id="forgot-email" type="email" placeholder="you@example.com" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                        </div>
+                    </div>
+                    <button onclick="submitForgot()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                        Send Reset Link <i data-lucide="send" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Reset Password View (Only triggered by link params) -->
+                <div id="view-reset" class="space-y-6 hidden">
+                    <div class="text-center space-y-2">
+                        <i data-lucide="refresh-cw" class="w-12 h-12 text-brand-500 mx-auto"></i>
+                        <h3 class="text-lg font-bold">Set New Password</h3>
+                        <p class="text-sm text-slate-400">Please enter a new, secure password below.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-300">New Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input id="reset-password" type="password" placeholder="••••••••" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                        </div>
+                    </div>
+                    <button onclick="submitReset()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                        Update Password <i data-lucide="save" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Profile View -->
+                <div id="view-profile" class="space-y-6 hidden">
+                    <div class="bg-slate-900/50 border border-slate-800/80 rounded-xl p-4 space-y-3">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-semibold uppercase tracking-wider">Access Token</span>
+                            <button onclick="clearTokens()" class="text-red-400 hover:text-red-300 font-bold hover:underline">Log Out</button>
+                        </div>
+                        <textarea id="token-display" placeholder="No JWT Access Token found. Log in or paste one here to authenticate profile queries." class="w-full h-24 bg-slate-950 border border-slate-850 rounded-lg p-3 text-xs font-mono text-emerald-400 focus:outline-none focus:border-brand-500 placeholder-slate-600" oninput="saveManualToken()"></textarea>
+                    </div>
+
+                    <button onclick="fetchProfile()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                        Fetch Profile Details <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    </button>
+
+                    <div id="profile-result" class="hidden bg-slate-900/50 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 whitespace-pre-wrap overflow-x-auto"></div>
+                </div>
+            </div>
+
+            <!-- API Console Logs -->
+            <div class="mt-8 border-t border-slate-800 pt-6">
+                <div class="flex justify-between items-center text-xs font-semibold text-slate-400 mb-3">
+                    <span>Console Log Status</span>
+                    <button onclick="clearConsole()" class="text-slate-500 hover:text-slate-300">Clear</button>
+                </div>
+                <div id="api-console" class="h-28 bg-slate-950/80 border border-slate-900 rounded-xl p-3 text-[11px] font-mono text-indigo-300 space-y-1 overflow-y-auto">
+                    <div>Waiting for API interaction...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-5xl mx-auto px-6 py-6 text-center text-xs text-slate-650">
+        <p>&copy; 2026 AuthFlow API testing page. Connected locally on port 8080.</p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // Init Lucide
+        lucide.createIcons();
+
+        // Saved Registration Email for OTP Verification
+        let registerEmail = "";
+
+        // Check if token exists in URL parameters (for Reset Password)
+        const urlParams = new URLSearchParams(window.location.search);
+        const resetToken = urlParams.get('token');
+        if (resetToken) {
+            switchTab('reset');
+            logConsole("Detected password reset token in URL parameters.");
+        }
+
+        // Initialize Token on Load
+        const storedToken = localStorage.getItem('accessToken');
+        if (storedToken) {
+            document.getElementById('token-display').value = storedToken;
+        }
+
+        function logConsole(message, type = 'info') {
+            const consoleBox = document.getElementById('api-console');
+            const time = new Date().toLocaleTimeString();
+            let color = 'text-indigo-300';
+            if (type === 'success') color = 'text-emerald-400';
+            if (type === 'error') color = 'text-rose-400';
+
+            const logDiv = document.createElement('div');
+            logDiv.className = color;
+            logDiv.innerHTML = `[${time}] ${message}`;
+            consoleBox.appendChild(logDiv);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('api-console').innerHTML = "<div>Console cleared.</div>";
+        }
+
+        function saveManualToken() {
+            const token = document.getElementById('token-display').value.trim();
+            if (token) {
+                localStorage.setItem('accessToken', token);
+                logConsole("Manual JWT Access Token updated in localStorage.", "success");
+            } else {
+                localStorage.removeItem('accessToken');
+                logConsole("JWT Access Token cleared.", "info");
+            }
+        }
+
+        function clearTokens() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            document.getElementById('token-display').value = "";
+            document.getElementById('profile-result').classList.add('hidden');
+            logConsole("Auth tokens cleared. Logged out.", "info");
+        }
+
+        function switchTab(tab) {
+            // Hide all views
+            ['login', 'register', 'otp', 'forgot', 'reset', 'profile'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+
+            // Update Tab styles (except for non-tab screens like otp / reset)
+            ['login', 'register', 'forgot', 'profile'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (btn) {
+                    btn.className = "flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all";
+                }
+            });
+
+            // Show active view
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            if (activeBtn) {
+                activeBtn.className = "flex-1 pb-3 text-sm font-semibold border-b-2 border-brand-500 text-white transition-all";
+            }
+        }
+
+        async function submitLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                logConsole("Missing login credentials.", "error");
+                return;
+            }
+
+            logConsole("Calling POST /api/auth/login...");
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const body = await res.json();
+                
+                if (res.ok && body.success) {
+                    logConsole("Login successful!", "success");
+                    localStorage.setItem('accessToken', body.data.accessToken);
+                    localStorage.setItem('refreshToken', body.data.refreshToken);
+                    document.getElementById('token-display').value = body.data.accessToken;
+                    switchTab('profile');
+                } else {
+                    logConsole(`Failed: ${body.message || 'Login credentials incorrect'}`, "error");
+                }
+            } catch (err) {
+                logConsole(`Error: ${err.message}`, "error");
+            }
+        }
+
+        async function submitRegister() {
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+
+            if (!name || !email || !password) {
+                logConsole("Missing registration details.", "error");
+                return;
+            }
+
+            logConsole("Calling POST /api/auth/register...");
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const body = await res.json();
+
+                if (res.ok && body.success) {
+                    logConsole("User registration successful! OTP sent.", "success");
+                    registerEmail = email;
+                    switchTab('otp');
+                } else {
+                    logConsole(`Failed: ${body.message}`, "error");
+                }
+            } catch (err) {
+                logConsole(`Error: ${err.message}`, "error");
+            }
+        }
+
+        async function submitOtp() {
+            const code = document.getElementById('otp-code').value.trim();
+
+            if (!code || !registerEmail) {
+                logConsole("Missing OTP code or register session details.", "error");
+                return;
+            }
+
+            logConsole("Calling POST /api/auth/verify-otp...");
+            try {
+                const res = await fetch('/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: registerEmail, code })
+                });
+                const body = await res.json();
+
+                if (res.ok && body.success) {
+                    logConsole("OTP verified and account activated successfully!", "success");
+                    switchTab('login');
+                } else {
+                    logConsole(`Verification failed: ${body.message}`, "error");
+                }
+            } catch (err) {
+                logConsole(`Error: ${err.message}`, "error");
+            }
+        }
+
+        async function submitForgot() {
+            const email = document.getElementById('forgot-email').value.trim();
+
+            if (!email) {
+                logConsole("Email is required.", "error");
+                return;
+            }
+
+            logConsole("Calling POST /api/auth/forgot-password...");
+            try {
+                const res = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const body = await res.json();
+
+                if (res.ok && body.success) {
+                    logConsole("Password reset link sent! Check your email inbox.", "success");
+                } else {
+                    logConsole(`Failed: ${body.message}`, "error");
+                }
+            } catch (err) {
+                logConsole(`Error: ${err.message}`, "error");
+            }
+        }
+
+        async function submitReset() {
+            const password = document.getElementById('reset-password').value;
+
+            if (!password || !resetToken) {
+                logConsole("New password is required, or missing reset token.", "error");
+                return;
+            }
+
+            logConsole("Calling POST /api/auth/reset-password...");
+            try {
+                const res = await fetch('/api/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: resetToken, password })
+                });
+                const body = await res.json();
+
+                if (res.ok && body.success) {
+                    logConsole("Password updated successfully! Redirecting to login...", "success");
+                    setTimeout(() => {
+                        window.location.href = window.location.pathname; // strip query params
+                    }, 2000);
+                } else {
+                    logConsole(`Failed: ${body.message}`, "error");
+                }
+            } catch (err) {
+                logConsole(`Error: ${err.message}`, "error");
+            }
+        }
+
+        async function fetchProfile() {
+            const token = localStorage.getItem('accessToken');
+            const resultBox = document.getElementById('profile-result');
+
+            if (!token) {
+                logConsole("Cannot fetch profile: No token stored.", "error");
+                return;
+            }
+
+            logConsole("Calling GET /api/auth/profile with Bearer Token...");
+            try {
+                const res = await fetch('/api/auth/profile', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (res.ok) {
+                    const email = await res.text();
+                    logConsole("Profile retrieved successfully!", "success");
+                    resultBox.classList.remove('hidden');
+                    resultBox.innerText = `Authenticated User Email:\n${email}`;
+                } else {
+                    logConsole(`Request failed with status ${res.status}`, "error");
+                }
+            } catch (err) {
+                logConsole(`Error: ${err.message}`, "error");
+            }
+        }
+    </script>
+</body>
+</html>
