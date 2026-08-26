@@ -272,7 +272,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col justify-between p-6">
       {/* Navbar Header */}
-      <header class="w-full max-w-5xl mx-auto flex justify-between items-center py-4 px-2">
+      <header className="w-full max-w-5xl mx-auto flex justify-between items-center py-4 px-2">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-cyan-500 shadow-lg shadow-cyan-500/20 flex items-center justify-center">
             <ShieldCheck className="w-6 h-6 text-slate-950" />
