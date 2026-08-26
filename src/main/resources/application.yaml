@@ -24,7 +24,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: your-email@gmail.com
+    username: vikasprajapati1639@gmail.com
     password: wjji zecy vvlu geno
 
     properties:
@@ -34,6 +34,23 @@ spring:
           starttls:
             enable: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+
 app:
   otp:
     expiry: 5
@@ -41,3 +58,7 @@ app:
     secret: 5S9mW3JfP8xR2vN6LqK8ZbT1YhD4cX7AaE9FwQ2LmR5NpU8HvJ
     access-token-expiration: 900000
     refresh-token-expiration: 604800000
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.web: DEBUG

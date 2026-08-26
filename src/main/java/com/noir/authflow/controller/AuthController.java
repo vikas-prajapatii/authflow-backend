@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -50,10 +51,17 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public String profile(
-            @AuthenticationPrincipal UserDetails userDetails){
-
-        return userDetails.getUsername();
+    public String profile(Authentication authentication) {
+        if (authentication == null) {
+            return "Anonymous";
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getUsername();
+        } else if (principal instanceof OAuth2User oAuth2User) {
+            return oAuth2User.getAttribute("email");
+        }
+        return authentication.getName();
     }
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<LoginResponse>>
