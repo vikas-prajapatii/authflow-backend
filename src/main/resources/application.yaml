@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: authflow-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authflow_db
+    username: postgres
+    password: Vi12sh@1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your-email@gmail.com
+    password: wjji zecy vvlu geno
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  otp:
+    expiry: 5
+  jwt:
+    secret: 5S9mW3JfP8xR2vN6LqK8ZbT1YhD4cX7AaE9FwQ2LmR5NpU8HvJ
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000
