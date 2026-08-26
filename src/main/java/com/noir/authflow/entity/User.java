@@ -33,7 +33,11 @@ public class User extends BaseEntity{
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    private AuthProvider provider;
+    @Column(nullable = false)
+    @Builder.Default
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    private String providerId;
 
     @Column(nullable = false)
     private Boolean enabled;
