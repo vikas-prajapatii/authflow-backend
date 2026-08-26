@@ -172,7 +172,7 @@ export default function App() {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: registerEmail, code: otpCode })
+        body: JSON.stringify({ email: registerEmail, otp: otpCode })
       });
       const data = await res.json();
 
