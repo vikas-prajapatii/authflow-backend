@@ -4,6 +4,8 @@ import com.noir.authflow.dto.request.LoginRequest;
 import com.noir.authflow.dto.request.RefreshTokenRequest;
 import com.noir.authflow.dto.request.RegisterRequest;
 import com.noir.authflow.dto.request.VerifyOtpRequest;
+import com.noir.authflow.dto.request.ForgotPasswordRequest;
+import com.noir.authflow.dto.request.ResetPasswordRequest;
 import com.noir.authflow.dto.response.ApiResponse;
 import com.noir.authflow.dto.response.AuthResponse;
 import com.noir.authflow.dto.response.LoginResponse;
@@ -19,4 +21,7 @@ public interface AuthService {
 
     ApiResponse<LoginResponse> refreshToken(RefreshTokenRequest request);
 
+    ApiResponse<String> forgotPassword(ForgotPasswordRequest request);
+
+    ApiResponse<String> resetPassword(ResetPasswordRequest request);
 }

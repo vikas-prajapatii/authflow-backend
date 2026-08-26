@@ -4,6 +4,8 @@ import com.noir.authflow.dto.request.LoginRequest;
 import com.noir.authflow.dto.request.RefreshTokenRequest;
 import com.noir.authflow.dto.request.RegisterRequest;
 import com.noir.authflow.dto.request.VerifyOtpRequest;
+import com.noir.authflow.dto.request.ForgotPasswordRequest;
+import com.noir.authflow.dto.request.ResetPasswordRequest;
 import com.noir.authflow.dto.response.ApiResponse;
 import com.noir.authflow.dto.response.LoginResponse;
 import com.noir.authflow.dto.response.RegisterResponse;
@@ -125,6 +127,49 @@ public class AuthServiceImpl implements AuthService {
                 .success(true)
                 .message("Access token generated")
                 .data(response)
+                .build();
+     }
+
+    @Override
+    @Transactional
+    public ApiResponse<String> forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+
+        String token = java.util.UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(java.time.LocalDateTime.now().plusMinutes(15));
+        userRepository.save(user);
+
+        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+        mailService.sendPasswordResetLink(user.getEmail(), resetLink);
+
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("Password reset link sent to your email")
+                .data("Reset email sent")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<String> resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByResetToken(request.getToken())
+                .orElseThrow(() -> new InvalidTokenException("Invalid or expired reset token"));
+
+        if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+            throw new InvalidTokenException("Reset token has expired");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
+
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("Password reset successfully")
+                .data("Password updated")
                 .build();
     }
 }

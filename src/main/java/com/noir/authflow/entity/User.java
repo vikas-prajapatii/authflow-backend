@@ -44,4 +44,8 @@ public class User extends BaseEntity{
 
     @Column(nullable = true, length = 6)
     private String code;
+
+    private String resetToken;
+
+    private java.time.LocalDateTime resetTokenExpiry;
 }

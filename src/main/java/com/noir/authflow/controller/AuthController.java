@@ -4,6 +4,8 @@ import com.noir.authflow.dto.request.LoginRequest;
 import com.noir.authflow.dto.request.RefreshTokenRequest;
 import com.noir.authflow.dto.request.RegisterRequest;
 import com.noir.authflow.dto.request.VerifyOtpRequest;
+import com.noir.authflow.dto.request.ForgotPasswordRequest;
+import com.noir.authflow.dto.request.ResetPasswordRequest;
 import com.noir.authflow.dto.response.ApiResponse;
 import com.noir.authflow.dto.response.AuthResponse;
 import com.noir.authflow.dto.response.LoginResponse;
@@ -73,6 +75,17 @@ public class AuthController {
         return ResponseEntity.ok(
                 authService.refreshToken(request)
         );
+    }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(
+            @RequestBody @Valid ForgotPasswordRequest request) {
+        return ResponseEntity.ok(authService.forgotPassword(request));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(
+            @RequestBody @Valid ResetPasswordRequest request) {
+        return ResponseEntity.ok(authService.resetPassword(request));
     }
 }
