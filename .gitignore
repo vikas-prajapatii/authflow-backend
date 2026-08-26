@@ -34,3 +34,7 @@ build/
 
 ### Local Configuration ###
 src/main/resources/application-local.yaml
+
+### Frontend Ignores ###
+frontend/node_modules/
+frontend/dist/
